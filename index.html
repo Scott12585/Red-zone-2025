@@ -34,24 +34,19 @@
         th {
             background-color: #f2f2f2;
         }
-        .autocomplete-container {
+        .entry-link {
             margin-top: 20px;
         }
-        .autocomplete-container input {
-            width: 80%;
-            padding: 10px;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .autocomplete-container button {
+        .entry-link a {
             padding: 10px;
             border: none;
             border-radius: 5px;
             background-color: #4CAF50;
             color: white;
-            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
         }
-        .autocomplete-container button:hover {
+        .entry-link a:hover {
             background-color: #45a049;
         }
     </style>
@@ -94,21 +89,18 @@
         </tbody>
     </table>
 
-    <div class="autocomplete-container">
-        <input type="text" id="player-input" placeholder="Type to search for a player...">
-        <button id="submit-pick">Submit Pick</button>
+    <div class="entry-link">
+        <a href="entry.html">Go to Player Entry</a>
     </div>
 
     <script>
-        const playerInput = document.getElementById('player-input');
-        const submitPickButton = document.getElementById('submit-pick');
         const onTheClock = document.getElementById('on-the-clock');
         const currentPick = document.getElementById('current-pick');
 
         let currentRound = 1;
         let currentTeam = 1;
         let currentPlayer = '';
-        
+
         // Initialize draft board state
         function initializeDraftBoard() {
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
@@ -124,6 +116,12 @@
         function updateDraftState() {
             onTheClock.textContent = `Team ${currentTeam}, Round ${currentRound}`;
             currentPick.textContent = currentPlayer || 'None';
+        }
+
+        // Update current player from input
+        function updateCurrentPlayer(player) {
+            currentPlayer = player;
+            updateDraftState();
         }
 
         // Handle pick submission
@@ -147,14 +145,6 @@
                 updateDraftState();
             }
         }
-
-        // Update current player from input
-        playerInput.addEventListener('input', (event) => {
-            currentPlayer = event.target.value;
-            updateDraftState();
-        });
-
-        submitPickButton.addEventListener('click', handlePick);
 
         // Initial rendering of the draft board
         initializeDraftBoard();
