@@ -97,7 +97,6 @@
         const onTheClock = document.getElementById('on-the-clock');
         const currentPick = document.getElementById('current-pick');
 
-        // Function to initialize draft board and update the draft state
         function initializeDraftBoard() {
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
             for (let round = 1; round <= 16; round++) {
@@ -109,52 +108,17 @@
             updateDraftState();
         }
 
-        // Function to update On The Clock and Current Pick
         function updateDraftState() {
-            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
-            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
-            const pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
+            const currentRound = Math.ceil((currentTeam + 10 - 1) / 10);
+            const currentTeamNumber = ((currentTeam - 1) % 10) + 1;
+            const pickNumber = (currentTeam - 1) % 10 + 1;
 
             onTheClock.textContent = `Team ${currentTeam}`;
             currentPick.textContent = `Round ${currentRound}, Pick ${pickNumber}`;
         }
 
-        // Function to update the current player and move to the next pick
-        function updateCurrentPlayer(player) {
-            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
-            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
-            const pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
-
-            const cellId = `round${currentRound}team${currentTeam}`;
-            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-            draftPicks[cellId] = player;
-            localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-
-            // Move to next pick
-            let newPickNumber = pickNumber + 1;
-            let newCurrentTeam = currentTeam;
-            let newCurrentRound = currentRound;
-
-            if (newPickNumber > 10) {
-                newPickNumber = 1;
-                newCurrentTeam++;
-                if (newCurrentTeam > 10) {
-                    newCurrentTeam = 1;
-                    newCurrentRound++;
-                }
-            }
-
-            localStorage.setItem('currentRound', newCurrentRound);
-            localStorage.setItem('currentTeam', newCurrentTeam);
-            localStorage.setItem('pickNumber', newPickNumber);
-
-            initializeDraftBoard();
-        }
-
-        // Initial rendering of the draft board
         initializeDraftBoard();
 
-        // Auto-refresh the draft board every 5 seconds
         setInterval(initializeDraftBoard, 5000);
     </script>
 </body>
