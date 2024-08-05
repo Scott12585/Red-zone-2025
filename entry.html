@@ -3,108 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter Draft Pick - The Redzone</title>
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <title>Player Entry - The Redzone</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
         }
-        input, button {
-            margin: 10px;
+        .form-container {
+            margin-top: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+        input[type="text"], select {
             padding: 10px;
+            margin: 10px 0;
+            width: 80%;
+            max-width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1>Enter Draft Pick - The Redzone</h1>
-    <div>
-        <p id="currentPick">Round 1, Team 1</p>
-        <label for="player">Player:</label>
-        <input id="player" type="text" placeholder="Type player name">
-        <br>
-        <button onclick="addPick()">Add Pick</button>
-        <button onclick="removePick()">Remove Last Pick</button>
+    <h1>Player Entry - The Redzone</h1>
+    <div class="form-container">
+        <label for="player">Select Player:</label>
+        <input type="text" id="player" placeholder="Type player name">
+        <button onclick="submitPick()">Submit Pick</button>
     </div>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
     <script>
-        let currentRound = 1;
-        let currentTeam = 1;
+        // Fetch player list
+        let playerList = [];
 
-        function updateCurrentPickDisplay() {
-            document.getElementById('currentPick').innerText = `Round ${currentRound}, Team ${currentTeam}`;
-        }
+        fetch('players.json')
+            .then(response => response.json())
+            .then(data => {
+                playerList = data;
+                // Initialize autocomplete
+                new autoComplete({
+                    selector: '#player',
+                    minChars: 1,
+                    source: function(term, suggest) {
+                        term = term.toLowerCase();
+                        const suggestions = playerList.filter(player => player.toLowerCase().includes(term));
+                        suggest(suggestions);
+                    }
+                });
+            })
+            .catch(error => console.error('Error loading player list:', error));
 
-        function getNextPick() {
-            if (currentTeam < 10) {
-                currentTeam++;
-            } else {
-                currentTeam = 1;
-                currentRound++;
-            }
-            updateCurrentPickDisplay();
-        }
-
-        function getPreviousPick() {
-            if (currentTeam > 1) {
-                currentTeam--;
-            } else {
-                currentTeam = 10;
-                currentRound--;
-            }
-            updateCurrentPickDisplay();
-        }
-
-        async function addPick() {
-            const player = document.getElementById('player').value;
-
-            if (player) {
-                const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+        function submitPick() {
+            const playerInput = document.getElementById('player').value.trim();
+            if (playerInput) {
+                // Get current round and team from localStorage or default values
+                let currentRound = localStorage.getItem('currentRound') || 1;
+                let currentTeam = localStorage.getItem('currentTeam') || 1;
+                
                 const cellId = `round${currentRound}team${currentTeam}`;
-                draftPicks[cellId] = player;
+                let draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+                draftPicks[cellId] = playerInput;
                 localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
 
-                alert('Pick added!');
-                document.getElementById('player').value = '';
-                getNextPick();
+                // Move to next pick
+                let pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
+                pickNumber++;
+                if (pickNumber > 10) {
+                    pickNumber = 1;
+                    currentTeam++;
+                    if (currentTeam > 10) {
+                        currentTeam = 1;
+                        currentRound++;
+                    }
+                }
+                localStorage.setItem('currentRound', currentRound);
+                localStorage.setItem('currentTeam', currentTeam);
+                localStorage.setItem('pickNumber', pickNumber);
+
+                // Redirect back to draft board
+                window.location.href = 'index.html';
             } else {
                 alert('Please select a player.');
             }
         }
-
-        async function removePick() {
-            getPreviousPick();
-            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-            const cellId = `round${currentRound}team${currentTeam}`;
-            if (draftPicks[cellId]) {
-                delete draftPicks[cellId];
-                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-                alert('Last pick removed!');
-            } else {
-                alert('No pick found for the selected round and team.');
-            }
-        }
-
-        async function loadPlayers() {
-            try {
-                const response = await fetch('players.json');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const players = await response.json();
-                
-                $("#player").autocomplete({
-                    source: players
-                });
-            } catch (error) {
-                console.error('Error loading player list:', error);
-            }
-        }
-
-        // Initial display of the current pick
-        updateCurrentPickDisplay();
-        // Load player list and set up autocomplete on page load
-        loadPlayers();
     </script>
 </body>
 </html>
+
 
