@@ -3,63 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Draft Board</title>
+    <title>The Redzone Draft Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
         }
         .header {
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
+            padding: 0 20px;
         }
-        .draft-board {
-            display: grid;
-            grid-template-columns: repeat(10, 1fr);
-            gap: 2px;
-            margin-top: 20px;
-        }
-        .draft-board div {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: center;
-            background-color: #f9f9f9;
-        }
-        .info-box {
+        .header div {
             padding: 10px;
             background: #f0f0f0;
             border-radius: 5px;
             border: 1px solid #ddd;
         }
-        .dropdown-container {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
-        .autocomplete {
-            width: 100%;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .autocomplete-container {
+            margin-top: 20px;
+        }
+        .autocomplete-container input {
+            width: 80%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .autocomplete-container button {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        .autocomplete-container button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
+    <h1>The Redzone Draft Board</h1>
+    
+    <!-- Header with On The Clock and Current Pick -->
     <div class="header">
-        <div class="info-box">
+        <div>
             <strong>On The Clock:</strong> <span id="on-the-clock">Team 1, Round 1</span>
         </div>
-        <div class="info-box">
+        <div>
             <strong>Current Pick:</strong> <span id="current-pick">None</span>
         </div>
     </div>
 
-    <div class="draft-board" id="draft-board">
-        <!-- Draft board cells will be dynamically added here -->
-    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Round</th>
+                <script>
+                    for (let i = 1; i <= 10; i++) {
+                        document.write(`<th>Team ${i}</th>`);
+                    }
+                </script>
+            </tr>
+        </thead>
+        <tbody id="draftBoard">
+            <script>
+                for (let round = 1; round <= 16; round++) {
+                    document.write('<tr>');
+                    document.write(`<td>${round}</td>`);
+                    for (let team = 1; team <= 10; team++) {
+                        document.write(`<td id="round${round}team${team}"></td>`);
+                    }
+                    document.write('</tr>');
+                }
+            </script>
+        </tbody>
+    </table>
 
-    <div class="dropdown-container">
-        <input type="text" id="player-input" class="autocomplete" placeholder="Search for a player...">
+    <div class="autocomplete-container">
+        <input type="text" id="player-input" placeholder="Type to search for a player...">
         <button id="submit-pick">Submit Pick</button>
     </div>
 
     <script>
-        const board = document.getElementById('draft-board');
         const playerInput = document.getElementById('player-input');
         const submitPickButton = document.getElementById('submit-pick');
         const onTheClock = document.getElementById('on-the-clock');
@@ -68,41 +108,34 @@
         let currentRound = 1;
         let currentTeam = 1;
         let currentPlayer = '';
-        let draftBoard = Array.from({ length: 16 }, () => Array(10).fill(''));
-
-        function createDraftBoard() {
-            board.innerHTML = '';
-            for (let round = 0; round < 16; round++) {
-                for (let team = 0; team < 10; team++) {
-                    const cell = document.createElement('div');
-                    cell.textContent = draftBoard[round][team] || '';
-                    board.appendChild(cell);
+        
+        // Initialize draft board state
+        function initializeDraftBoard() {
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            for (let round = 1; round <= 16; round++) {
+                for (let team = 1; team <= 10; team++) {
+                    const cellId = `round${round}team${team}`;
+                    document.getElementById(cellId).innerText = draftPicks[cellId] || '';
                 }
             }
         }
 
-        function updateDraftBoard() {
-            for (let round = 0; round < 16; round++) {
-                for (let team = 0; team < 10; team++) {
-                    board.children[round * 10 + team].textContent = draftBoard[round][team] || '';
-                }
-            }
-        }
-
-        function updateOnTheClock() {
+        // Update On The Clock and Current Pick
+        function updateDraftState() {
             onTheClock.textContent = `Team ${currentTeam}, Round ${currentRound}`;
-        }
-
-        function updateCurrentPick() {
             currentPick.textContent = currentPlayer || 'None';
         }
 
+        // Handle pick submission
         function handlePick() {
             if (currentPlayer) {
-                draftBoard[currentRound - 1][currentTeam - 1] = currentPlayer;
-                updateDraftBoard();
+                const cellId = `round${currentRound}team${currentTeam}`;
+                const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+                draftPicks[cellId] = currentPlayer;
+                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+                initializeDraftBoard();
                 currentPlayer = '';
-                updateCurrentPick();
+                updateDraftState();
                 currentTeam++;
                 if (currentTeam > 10) {
                     currentTeam = 1;
@@ -111,22 +144,23 @@
                 if (currentRound > 16) {
                     currentRound = 16;
                 }
-                updateOnTheClock();
+                updateDraftState();
             }
         }
 
+        // Update current player from input
+        playerInput.addEventListener('input', (event) => {
+            currentPlayer = event.target.value;
+            updateDraftState();
+        });
+
         submitPickButton.addEventListener('click', handlePick);
 
-        function handlePlayerInput(event) {
-            const value = event.target.value;
-            currentPlayer = value;
-            updateCurrentPick();
-        }
+        // Initial rendering of the draft board
+        initializeDraftBoard();
 
-        playerInput.addEventListener('input', handlePlayerInput);
-
-        createDraftBoard();
-        updateOnTheClock();
+        // Auto-refresh the draft board every 5 seconds
+        setInterval(initializeDraftBoard, 5000);
     </script>
 </body>
 </html>
