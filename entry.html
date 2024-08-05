@@ -87,22 +87,24 @@
         }
 
         // Load player list and populate dropdown
-        async function loadPlayers() {
-            try {
-                const response = await fetch('players.json');
-                const players = await response.json();
-                const playerSelect = document.getElementById('player');
-                
-                players.forEach(player => {
-                    const option = document.createElement('option');
-                    option.value = player;
-                    option.textContent = player;
-                    playerSelect.appendChild(option);
-                });
-            } catch (error) {
-                console.error('Error loading player list:', error);
-            }
-        }
+  async function loadPlayers() {
+    try {
+        const response = await fetch('players.json');
+        if (!response.ok) throw new Error('Network response was not ok');
+        const players = await response.json();
+        const playerSelect = document.getElementById('player');
+        
+        players.forEach(player => {
+            const option = document.createElement('option');
+            option.value = player;
+            option.textContent = player;
+            playerSelect.appendChild(option);
+        });
+    } catch (error) {
+        console.error('Error loading player list:', error);
+    }
+}
+
 
         // Initial display of the current pick
         updateCurrentPickDisplay();
