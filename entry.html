@@ -3,145 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Entry</title>
+    <title>Player Entry - The Redzone Draft Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
         }
         .container {
-            margin: 20px auto;
-            max-width: 600px;
+            margin: 20px;
         }
         input, button {
             padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        input[type="text"] {
-            width: calc(100% - 22px);
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
+            margin: 10px;
             font-size: 16px;
         }
-        button:hover {
+        .entry-link {
+            margin-top: 20px;
+        }
+        .entry-link a {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .entry-link a:hover {
             background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <h1>Player Entry</h1>
+    <h1>Player Entry - The Redzone Draft Board</h1>
+
     <div class="container">
-        <input type="text" id="playerInput" placeholder="Type player name" autocomplete="off">
-        <button onclick="submitPick()">Submit Pick</button>
+        <label for="player-name">Enter Player Name:</label>
+        <input type="text" id="player-name" placeholder="Type player name">
+        <button onclick="submitPlayer()">Submit</button>
+    </div>
+
+    <div class="entry-link">
+        <a href="index.html">Back to Draft Board</a>
     </div>
 
     <script>
-        // Fetch player names from players.json
-        async function fetchPlayers() {
-            try {
-                const response = await fetch('players.json');
-                const players = await response.json();
-                return players;
-            } catch (error) {
-                console.error('Error fetching players:', error);
-                return [];
-            }
+        const playerInput = document.getElementById('player-name');
+        let currentRound = 1;
+        let currentTeam = 1;
+        let pickNumber = 1;
+
+        function getNextDraftPick() {
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            let nextPick = `round${currentRound}team${currentTeam}`;
+            return draftPicks[nextPick] ? getNextDraftPick() : nextPick;
         }
 
-        // Create autocomplete functionality
-        function autocomplete(input, suggestions) {
-            let currentFocus;
-
-            input.addEventListener("input", function() {
-                let list, item, i, val = this.value;
-                closeAllLists();
-                if (!val) return false;
-                currentFocus = -1;
-                list = document.createElement("DIV");
-                list.setAttribute("id", this.id + "autocomplete-list");
-                list.setAttribute("class", "autocomplete-items");
-                this.parentNode.appendChild(list);
-
-                for (i = 0; i < suggestions.length; i++) {
-                    if (suggestions[i].toLowerCase().includes(val.toLowerCase())) {
-                        item = document.createElement("DIV");
-                        item.innerHTML = "<strong>" + suggestions[i].substr(0, val.length) + "</strong>";
-                        item.innerHTML += suggestions[i].substr(val.length);
-                        item.addEventListener("click", function() {
-                            input.value = this.innerText;
-                            closeAllLists();
-                        });
-                        list.appendChild(item);
-                    }
-                }
-            });
-
-            function closeAllLists(elmnt) {
-                const items = document.getElementsByClassName("autocomplete-items");
-                for (const item of items) {
-                    if (elmnt !== item && elmnt !== input) {
-                        item.parentNode.removeChild(item);
-                    }
-                }
-            }
-
-            document.addEventListener("click", function (e) {
-                closeAllLists(e.target);
-            });
-        }
-
-        // Submit the player pick
-        async function submitPick() {
-            const playerInput = document.getElementById('playerInput').value;
-            if (!playerInput) {
+        function submitPlayer() {
+            const playerName = playerInput.value.trim();
+            if (playerName === '') {
                 alert('Please enter a player name.');
                 return;
             }
 
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
-            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
+            const nextPick = getNextDraftPick();
 
-            const cellId = `round${currentRound}team${currentTeam}`;
-            draftPicks[cellId] = playerInput;
+            draftPicks[nextPick] = playerName;
             localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
 
-            // Move to the next pick
-            let newPickNumber = (parseInt(localStorage.getItem('pickNumber')) || 1) + 1;
-            let newCurrentTeam = currentTeam;
-            let newCurrentRound = currentRound;
-
-            if (newPickNumber > 10) {
-                newPickNumber = 1;
-                newCurrentTeam++;
-                if (newCurrentTeam > 10) {
-                    newCurrentTeam = 1;
-                    newCurrentRound++;
-                }
-            }
-
-            localStorage.setItem('currentRound', newCurrentRound);
-            localStorage.setItem('currentTeam', newCurrentTeam);
-            localStorage.setItem('pickNumber', newPickNumber);
-
-            window.location.href = 'index.html';
+            playerInput.value = ''; // Clear input field
+            updateDraftState(); // Update draft state for next pick
         }
 
-        // Initialize the autocomplete functionality
-        (async function() {
-            const players = await fetchPlayers();
-            autocomplete(document.getElementById('playerInput'), players);
-        })();
+        function updateDraftState() {
+            pickNumber++;
+            if (pickNumber > 10) {
+                pickNumber = 1;
+                currentTeam++;
+                if (currentTeam > 10) {
+                    currentTeam = 1;
+                    currentRound++;
+                }
+            }
+        }
     </script>
 </body>
 </html>
-
-
 
