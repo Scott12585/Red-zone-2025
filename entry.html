@@ -3,33 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Player Entry - The Redzone</title>
+    <title>Player Entry</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
         }
-        .form-container {
-            margin-top: 20px;
+        .container {
+            margin: 20px auto;
+            max-width: 600px;
         }
-        label {
-            display: block;
-            margin: 10px 0;
-        }
-        input[type="text"], select {
+        input, button {
             padding: 10px;
             margin: 10px 0;
-            width: 80%;
-            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
         }
         button {
-            padding: 10px 20px;
-            font-size: 16px;
             background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #45a049;
@@ -37,69 +36,112 @@
     </style>
 </head>
 <body>
-    <h1>Player Entry - The Redzone</h1>
-    <div class="form-container">
-        <label for="player">Select Player:</label>
-        <input type="text" id="player" placeholder="Type player name">
+    <h1>Player Entry</h1>
+    <div class="container">
+        <input type="text" id="playerInput" placeholder="Type player name" autocomplete="off">
         <button onclick="submitPick()">Submit Pick</button>
     </div>
 
     <script>
-        // Fetch player list
-        let playerList = [];
-
-        fetch('players.json')
-            .then(response => response.json())
-            .then(data => {
-                playerList = data;
-                // Initialize autocomplete
-                new autoComplete({
-                    selector: '#player',
-                    minChars: 1,
-                    source: function(term, suggest) {
-                        term = term.toLowerCase();
-                        const suggestions = playerList.filter(player => player.toLowerCase().includes(term));
-                        suggest(suggestions);
-                    }
-                });
-            })
-            .catch(error => console.error('Error loading player list:', error));
-
-        function submitPick() {
-            const playerInput = document.getElementById('player').value.trim();
-            if (playerInput) {
-                // Get current round and team from localStorage or default values
-                let currentRound = localStorage.getItem('currentRound') || 1;
-                let currentTeam = localStorage.getItem('currentTeam') || 1;
-                
-                const cellId = `round${currentRound}team${currentTeam}`;
-                let draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-                draftPicks[cellId] = playerInput;
-                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-
-                // Move to next pick
-                let pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
-                pickNumber++;
-                if (pickNumber > 10) {
-                    pickNumber = 1;
-                    currentTeam++;
-                    if (currentTeam > 10) {
-                        currentTeam = 1;
-                        currentRound++;
-                    }
-                }
-                localStorage.setItem('currentRound', currentRound);
-                localStorage.setItem('currentTeam', currentTeam);
-                localStorage.setItem('pickNumber', pickNumber);
-
-                // Redirect back to draft board
-                window.location.href = 'index.html';
-            } else {
-                alert('Please select a player.');
+        // Fetch player names from players.json
+        async function fetchPlayers() {
+            try {
+                const response = await fetch('players.json');
+                const players = await response.json();
+                return players;
+            } catch (error) {
+                console.error('Error fetching players:', error);
+                return [];
             }
         }
+
+        // Create autocomplete functionality
+        function autocomplete(input, suggestions) {
+            let currentFocus;
+
+            input.addEventListener("input", function() {
+                let list, item, i, val = this.value;
+                closeAllLists();
+                if (!val) return false;
+                currentFocus = -1;
+                list = document.createElement("DIV");
+                list.setAttribute("id", this.id + "autocomplete-list");
+                list.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(list);
+
+                for (i = 0; i < suggestions.length; i++) {
+                    if (suggestions[i].toLowerCase().includes(val.toLowerCase())) {
+                        item = document.createElement("DIV");
+                        item.innerHTML = "<strong>" + suggestions[i].substr(0, val.length) + "</strong>";
+                        item.innerHTML += suggestions[i].substr(val.length);
+                        item.addEventListener("click", function() {
+                            input.value = this.innerText;
+                            closeAllLists();
+                        });
+                        list.appendChild(item);
+                    }
+                }
+            });
+
+            function closeAllLists(elmnt) {
+                const items = document.getElementsByClassName("autocomplete-items");
+                for (const item of items) {
+                    if (elmnt !== item && elmnt !== input) {
+                        item.parentNode.removeChild(item);
+                    }
+                }
+            }
+
+            document.addEventListener("click", function (e) {
+                closeAllLists(e.target);
+            });
+        }
+
+        // Submit the player pick
+        async function submitPick() {
+            const playerInput = document.getElementById('playerInput').value;
+            if (!playerInput) {
+                alert('Please enter a player name.');
+                return;
+            }
+
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
+            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
+
+            const cellId = `round${currentRound}team${currentTeam}`;
+            draftPicks[cellId] = playerInput;
+            localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+
+            // Move to the next pick
+            let newPickNumber = (parseInt(localStorage.getItem('pickNumber')) || 1) + 1;
+            let newCurrentTeam = currentTeam;
+            let newCurrentRound = currentRound;
+
+            if (newPickNumber > 10) {
+                newPickNumber = 1;
+                newCurrentTeam++;
+                if (newCurrentTeam > 10) {
+                    newCurrentTeam = 1;
+                    newCurrentRound++;
+                }
+            }
+
+            localStorage.setItem('currentRound', newCurrentRound);
+            localStorage.setItem('currentTeam', newCurrentTeam);
+            localStorage.setItem('pickNumber', newPickNumber);
+
+            window.location.href = 'index.html';
+        }
+
+        // Initialize the autocomplete functionality
+        (async function() {
+            const players = await fetchPlayers();
+            autocomplete(document.getElementById('playerInput'), players);
+        })();
     </script>
 </body>
 </html>
+
 
 
