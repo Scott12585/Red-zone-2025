@@ -23,10 +23,26 @@
         .draft-board {
             margin: 20px;
         }
+        .nav-link {
+            margin: 20px;
+        }
+        .nav-link a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .nav-link a:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
     <h1>Fantasy Football Draft Board</h1>
+    <div class="nav-link">
+        <a href="entry.html">Go to Entry Page</a>
+    </div>
     <table class="draft-board" id="draftBoard">
         <thead>
             <tr>
@@ -91,11 +107,7 @@
             populateDraftBoard(snapshot.val());
         });
     </script>
-    
-    <h1>Welcome to My Website</h1>
-    <p>This is the home page.</p>
-    <a href="entry.html">Go to Page 2</a>
-    
 </body>
 </html>
+
 
