@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Draft</title>
+    <title>Fantasy Football Draft Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -21,15 +21,28 @@
             background-color: #f2f2f2;
         }
         .draft-board {
-            margin-bottom: 20px;
+            margin: 20px;
         }
-        .input-form {
-            margin-bottom: 20px;
+        .nav-link {
+            margin: 20px;
+        }
+        .nav-link a {
+            text-decoration: none;
+            color: #fff;
+            background-color: #007bff;
+            padding: 10px 20px;
+            border-radius: 5px;
+        }
+        .nav-link a:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <h1>Fantasy Football Draft Board</h1>
+    <div class="nav-link">
+        <a href="entry.html">Go to Entry Page</a>
+    </div>
     <table class="draft-board" id="draftBoard">
         <thead>
             <tr>
@@ -51,67 +64,50 @@
         </tbody>
     </table>
 
-    <div class="input-form">
-        <h2>Enter Draft Pick</h2>
-        <form id="draftForm">
-            <label for="round">Round:</label>
-            <input type="number" id="round" name="round" min="1" max="16" required>
-            <label for="team">Team:</label>
-            <input type="number" id="team" name="team" min="1" max="10" required>
-            <label for="player">Player:</label>
-            <input type="text" id="player" name="player" required>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
-
+    <!-- Add Firebase JS SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-database.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const draftBoard = document.getElementById('draftBoard').getElementsByTagName('tbody')[0];
-            const draftForm = document.getElementById('draftForm');
-            const savedDrafts = JSON.parse(localStorage.getItem('draftBoardData')) || {};
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
 
-            function populateDraftBoard() {
-                draftBoard.innerHTML = ''; // Clear existing rows
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-                // Create 16 rounds for the draft board
-                for (let round = 1; round <= 16; round++) {
-                    let row = draftBoard.insertRow();
+        const draftBoard = document.getElementById('draftBoard').getElementsByTagName('tbody')[0];
+
+        function populateDraftBoard(drafts) {
+            draftBoard.innerHTML = ''; // Clear existing rows
+
+            // Create 16 rounds for the draft board
+            for (let round = 1; round <= 16; round++) {
+                let row = draftBoard.insertRow();
+                let cell = row.insertCell();
+                cell.textContent = round;
+                for (let team = 1; team <= 10; team++) {
                     let cell = row.insertCell();
-                    cell.textContent = round;
-                    for (let team = 1; team <= 10; team++) {
-                        let cell = row.insertCell();
-                        if (savedDrafts[`${round}-${team}`]) {
-                            cell.textContent = savedDrafts[`${round}-${team}`];
-                        }
+                    if (drafts[round] && drafts[round][team]) {
+                        cell.textContent = drafts[round][team];
                     }
                 }
             }
+        }
 
-            function saveDraftPick(round, team, player) {
-                savedDrafts[`${round}-${team}`] = player;
-                localStorage.setItem('draftBoardData', JSON.stringify(savedDrafts));
-            }
-
-            draftForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                const round = document.getElementById('round').value;
-                const team = document.getElementById('team').value;
-                const player = document.getElementById('player').value;
-
-                if (round >= 1 && round <= 16 && team >= 1 && team <= 10) {
-                    const row = draftBoard.rows[round - 1];
-                    const cell = row.cells[team];
-                    cell.textContent = player;
-                    saveDraftPick(round, team, player);
-                }
-
-                // Clear the form inputs
-                draftForm.reset();
-            });
-
-            populateDraftBoard();
+        // Listen for changes in the database
+        firebase.database().ref('drafts').on('value', function(snapshot) {
+            populateDraftBoard(snapshot.val());
         });
     </script>
 </body>
 </html>
+
 
