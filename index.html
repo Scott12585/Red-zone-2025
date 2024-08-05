@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
         }
-        .container {
+        .header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 10px;
@@ -25,8 +25,7 @@
             text-align: center;
             background-color: #f9f9f9;
         }
-        .current-pick, .on-the-clock {
-            margin: 0 10px;
+        .info-box {
             padding: 10px;
             background: #f0f0f0;
             border-radius: 5px;
@@ -41,11 +40,11 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="on-the-clock">
+    <div class="header">
+        <div class="info-box">
             <strong>On The Clock:</strong> <span id="on-the-clock">Team 1, Round 1</span>
         </div>
-        <div class="current-pick">
+        <div class="info-box">
             <strong>Current Pick:</strong> <span id="current-pick">None</span>
         </div>
     </div>
