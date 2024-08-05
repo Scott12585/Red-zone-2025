@@ -3,62 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Draft - Entry Form</title>
+    <title>Enter Draft Pick - The Redzone</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
         }
-        .input-form {
-            margin: 20px;
+        input, select, button {
+            margin: 10px;
+            padding: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Enter Draft Pick</h1>
-    <div class="input-form">
-        <form id="draftForm">
-            <label for="round">Round:</label>
-            <input type="number" id="round" name="round" min="1" max="16" required>
-            <label for="team">Team:</label>
-            <input type="number" id="team" name="team" min="1" max="10" required>
-            <label for="player">Player:</label>
-            <input type="text" id="player" name="player" required>
-            <button type="submit">Submit</button>
-        </form>
+    <h1>Enter Draft Pick - The Redzone</h1>
+    <div>
+        <p id="currentPick">Round 1, Team 1</p>
+        <label for="player">Player:</label>
+        <select id="player">
+            <option value="">Select player</option>
+            <!-- Players will be populated here -->
+        </select>
+        <br>
+        <button onclick="addPick()">Add Pick</button>
+        <button onclick="removePick()">Remove Last Pick</button>
     </div>
-
-    <!-- Add Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-database.js"></script>
     <script>
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        let currentRound = 1;
+        let currentTeam = 1;
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        function updateCurrentPickDisplay() {
+            document.getElementById('currentPick').innerText = `Round ${currentRound}, Team ${currentTeam}`;
+        }
 
-        document.getElementById('draftForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const round = document.getElementById('round').value;
-            const team = document.getElementById('team').value;
+        function getNextPick() {
+            if (currentTeam < 10) {
+                currentTeam++;
+            } else {
+                currentTeam = 1;
+                currentRound++;
+            }
+            updateCurrentPickDisplay();
+        }
+
+        function getPreviousPick() {
+            if (currentTeam > 1) {
+                currentTeam--;
+            } else {
+                currentTeam = 10;
+                currentRound--;
+            }
+            updateCurrentPickDisplay();
+        }
+
+        function addPick() {
             const player = document.getElementById('player').value;
 
-            if (round >= 1 && round <= 16 && team >= 1 && team <= 10) {
-                firebase.database().ref('drafts/' + round + '/' + team).set(player);
-            }
+            if (player) {
+                const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+                const cellId = `round${currentRound}team${currentTeam}`;
+                draftPicks[cellId] = player;
+                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
 
-            // Clear the form inputs
-            this.reset();
-        });
+                alert('Pick added!');
+                document.getElementById('player').value = '';
+                getNextPick();
+            } else {
+                alert('Please select a player.');
+            }
+        }
+
+        function removePick() {
+            getPreviousPick();
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            const cellId = `round${currentRound}team${currentTeam}`;
+            if (draftPicks[cellId]) {
+                delete draftPicks[cellId];
+                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+                alert('Last pick removed!');
+            } else {
+                alert('No pick found for the selected round and team.');
+            }
+        }
+
+        // Load player list and populate dropdown
+        async function loadPlayers() {
+            try {
+                const response = await fetch('players.json');
+                const players = await response.json();
+                const playerSelect = document.getElementById('player');
+                
+                players.forEach(player => {
+                    const option = document.createElement('option');
+                    option.value = player;
+                    option.textContent = player;
+                    playerSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading player list:', error);
+            }
+        }
+
+        // Initial display of the current pick
+        updateCurrentPickDisplay();
+        // Load player list on page load
+        loadPlayers();
     </script>
 </body>
 </html>
