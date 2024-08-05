@@ -57,10 +57,10 @@
     <!-- Header with On The Clock and Current Pick -->
     <div class="header">
         <div>
-            <strong>On The Clock:</strong> <span id="on-the-clock">Team 1, Round 1</span>
+            <strong>On The Clock:</strong> <span id="on-the-clock">Team 1</span>
         </div>
         <div>
-            <strong>Current Pick:</strong> <span id="current-pick">None</span>
+            <strong>Current Pick:</strong> <span id="current-pick">Round 1, Pick 1</span>
         </div>
     </div>
 
@@ -99,7 +99,7 @@
 
         let currentRound = 1;
         let currentTeam = 1;
-        let currentPlayer = '';
+        let pickNumber = 1;
 
         // Initialize draft board state
         function initializeDraftBoard() {
@@ -110,40 +110,32 @@
                     document.getElementById(cellId).innerText = draftPicks[cellId] || '';
                 }
             }
+            updateDraftState();
         }
 
         // Update On The Clock and Current Pick
         function updateDraftState() {
-            onTheClock.textContent = `Team ${currentTeam}, Round ${currentRound}`;
-            currentPick.textContent = currentPlayer || 'None';
+            onTheClock.textContent = `Team ${currentTeam}`;
+            currentPick.textContent = `Round ${currentRound}, Pick ${pickNumber}`;
         }
 
         // Update current player from input
         function updateCurrentPlayer(player) {
-            currentPlayer = player;
-            updateDraftState();
-        }
-
-        // Handle pick submission
-        function handlePick() {
-            if (currentPlayer) {
-                const cellId = `round${currentRound}team${currentTeam}`;
-                const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-                draftPicks[cellId] = currentPlayer;
-                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-                initializeDraftBoard();
-                currentPlayer = '';
-                updateDraftState();
+            const cellId = `round${currentRound}team${currentTeam}`;
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            draftPicks[cellId] = player;
+            localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+            initializeDraftBoard();
+            pickNumber++;
+            if (pickNumber > 10) {
+                pickNumber = 1;
                 currentTeam++;
                 if (currentTeam > 10) {
                     currentTeam = 1;
                     currentRound++;
                 }
-                if (currentRound > 16) {
-                    currentRound = 16;
-                }
-                updateDraftState();
             }
+            updateDraftState();
         }
 
         // Initial rendering of the draft board
@@ -154,3 +146,4 @@
     </script>
 </body>
 </html>
+
