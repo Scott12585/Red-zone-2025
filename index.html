@@ -3,111 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Draft Board</title>
+    <title>The Redzone Draft Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            text-align: center;
         }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-top: 20px;
         }
         th, td {
-            border: 1px solid #000;
-            text-align: center;
+            border: 1px solid #ddd;
             padding: 8px;
         }
         th {
             background-color: #f2f2f2;
         }
-        .draft-board {
-            margin: 20px;
+        .team-name {
+            width: 100px;
         }
-        .nav-link {
-            margin: 20px;
+        .player-pick {
+            width: 200px;
         }
-        .nav-link a {
-            text-decoration: none;
-            color: #fff;
-            background-color: #007bff;
+        input[type="text"] {
+            width: 80%;
+            padding: 5px;
+        }
+        button {
             padding: 10px 20px;
-            border-radius: 5px;
-        }
-        .nav-link a:hover {
-            background-color: #0056b3;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Fantasy Football Draft Board</h1>
-    <div class="nav-link">
-        <a href="entry.html">Go to Entry Page</a>
+    <h1>The Redzone Draft Board</h1>
+    <div>
+        <label for="team">Team:</label>
+        <select id="team">
+            <option value="">Select Team</option>
+            <script>
+                for (let i = 1; i <= 10; i++) {
+                    document.write(`<option value="Team ${i}">Team ${i}</option>`);
+                }
+            </script>
+        </select>
+        <br><br>
+        <label for="player">Player:</label>
+        <input type="text" id="player" placeholder="Enter player name">
+        <br><br>
+        <button onclick="addPick()">Add Pick</button>
     </div>
-    <table class="draft-board" id="draftBoard">
+    <table>
         <thead>
             <tr>
                 <th>Round</th>
-                <th>Team 1</th>
-                <th>Team 2</th>
-                <th>Team 3</th>
-                <th>Team 4</th>
-                <th>Team 5</th>
-                <th>Team 6</th>
-                <th>Team 7</th>
-                <th>Team 8</th>
-                <th>Team 9</th>
-                <th>Team 10</th>
+                <th>Pick</th>
+                <th>Team</th>
+                <th>Player</th>
             </tr>
         </thead>
-        <tbody>
-            <!-- Draft rounds will be inserted here by JavaScript -->
+        <tbody id="draftBoard">
         </tbody>
     </table>
 
-    <!-- Add Firebase JS SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.9.1/firebase-database.js"></script>
     <script>
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "YOUR_DATABASE_URL",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
+        let draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || [];
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        function renderDraftBoard() {
+            const draftBoard = document.getElementById('draftBoard');
+            draftBoard.innerHTML = '';
+            draftPicks.forEach((pick, index) => {
+                const round = Math.floor(index / 10) + 1;
+                const pickNumber = (index % 10) + 1;
+                draftBoard.innerHTML += `
+                    <tr>
+                        <td>${round}</td>
+                        <td>${pickNumber}</td>
+                        <td>${pick.team}</td>
+                        <td>${pick.player}</td>
+                    </tr>
+                `;
+            });
+        }
 
-        const draftBoard = document.getElementById('draftBoard').getElementsByTagName('tbody')[0];
+        function addPick() {
+            const team = document.getElementById('team').value;
+            const player = document.getElementById('player').value;
 
-        function populateDraftBoard(drafts) {
-            draftBoard.innerHTML = ''; // Clear existing rows
-
-            // Create 16 rounds for the draft board
-            for (let round = 1; round <= 16; round++) {
-                let row = draftBoard.insertRow();
-                let cell = row.insertCell();
-                cell.textContent = round;
-                for (let team = 1; team <= 10; team++) {
-                    let cell = row.insertCell();
-                    if (drafts[round] && drafts[round][team]) {
-                        cell.textContent = drafts[round][team];
-                    }
-                }
+            if (team && player) {
+                draftPicks.push({ team, player });
+                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+                renderDraftBoard();
+                document.getElementById('team').value = '';
+                document.getElementById('player').value = '';
+            } else {
+                alert('Please select a team and enter a player name.');
             }
         }
 
-        // Listen for changes in the database
-        firebase.database().ref('drafts').on('value', function(snapshot) {
-            populateDraftBoard(snapshot.val());
-        });
+        renderDraftBoard();
     </script>
 </body>
 </html>
-
 
