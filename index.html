@@ -3,71 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Redzone Draft Board</title>
+    <title>Fantasy Football Draft Board</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        .container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .draft-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
             margin-top: 20px;
         }
-        th, td {
+        .draft-board div {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 10px;
             text-align: center;
+            background-color: #f9f9f9;
         }
-        th {
-            background-color: #f2f2f2;
+        .current-pick, .on-the-clock {
+            margin: 0 10px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .dropdown-container {
+            margin-top: 20px;
+        }
+        .autocomplete {
+            width: 100%;
         }
     </style>
 </head>
 <body>
-    <h1>The Redzone Draft Board</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Round</th>
-                <script>
-                    for (let i = 1; i <= 10; i++) {
-                        document.write(`<th>Team ${i}</th>`);
-                    }
-                </script>
-            </tr>
-        </thead>
-        <tbody id="draftBoard">
-            <script>
-                for (let round = 1; round <= 16; round++) {
-                    document.write('<tr>');
-                    document.write(`<td>${round}</td>`);
-                    for (let team = 1; team <= 10; team++) {
-                        document.write(`<td id="round${round}team${team}"></td>`);
-                    }
-                    document.write('</tr>');
-                }
-            </script>
-        </tbody>
-    </table>
+    <div class="container">
+        <div class="on-the-clock">
+            <strong>On The Clock:</strong> <span id="on-the-clock">Team 1, Round 1</span>
+        </div>
+        <div class="current-pick">
+            <strong>Current Pick:</strong> <span id="current-pick">None</span>
+        </div>
+    </div>
+
+    <div class="draft-board" id="draft-board">
+        <!-- Draft board cells will be dynamically added here -->
+    </div>
+
+    <div class="dropdown-container">
+        <input type="text" id="player-input" class="autocomplete" placeholder="Search for a player...">
+        <button id="submit-pick">Submit Pick</button>
+    </div>
 
     <script>
-        function renderDraftBoard() {
-            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-            for (let round = 1; round <= 16; round++) {
-                for (let team = 1; team <= 10; team++) {
-                    const cellId = `round${round}team${team}`;
-                    document.getElementById(cellId).innerText = draftPicks[cellId] || '';
+        const board = document.getElementById('draft-board');
+        const playerInput = document.getElementById('player-input');
+        const submitPickButton = document.getElementById('submit-pick');
+        const onTheClock = document.getElementById('on-the-clock');
+        const currentPick = document.getElementById('current-pick');
+
+        let currentRound = 1;
+        let currentTeam = 1;
+        let currentPlayer = '';
+        let draftBoard = Array.from({ length: 16 }, () => Array(10).fill(''));
+
+        function createDraftBoard() {
+            board.innerHTML = '';
+            for (let round = 0; round < 16; round++) {
+                for (let team = 0; team < 10; team++) {
+                    const cell = document.createElement('div');
+                    cell.textContent = draftBoard[round][team] || '';
+                    board.appendChild(cell);
                 }
             }
         }
 
-        // Initial rendering of the draft board
-        renderDraftBoard();
+        function updateDraftBoard() {
+            for (let round = 0; round < 16; round++) {
+                for (let team = 0; team < 10; team++) {
+                    board.children[round * 10 + team].textContent = draftBoard[round][team] || '';
+                }
+            }
+        }
 
-        // Auto-refresh the draft board every 5 seconds
-        setInterval(renderDraftBoard, 5000);
+        function updateOnTheClock() {
+            onTheClock.textContent = `Team ${currentTeam}, Round ${currentRound}`;
+        }
+
+        function updateCurrentPick() {
+            currentPick.textContent = currentPlayer || 'None';
+        }
+
+        function handlePick() {
+            if (currentPlayer) {
+                draftBoard[currentRound - 1][currentTeam - 1] = currentPlayer;
+                updateDraftBoard();
+                currentPlayer = '';
+                updateCurrentPick();
+                currentTeam++;
+                if (currentTeam > 10) {
+                    currentTeam = 1;
+                    currentRound++;
+                }
+                if (currentRound > 16) {
+                    currentRound = 16;
+                }
+                updateOnTheClock();
+            }
+        }
+
+        submitPickButton.addEventListener('click', handlePick);
+
+        function handlePlayerInput(event) {
+            const value = event.target.value;
+            currentPlayer = value;
+            updateCurrentPick();
+        }
+
+        playerInput.addEventListener('input', handlePlayerInput);
+
+        createDraftBoard();
+        updateOnTheClock();
     </script>
-    <a href="entry.html">Enter Draft Picks</a>
 </body>
 </html>
