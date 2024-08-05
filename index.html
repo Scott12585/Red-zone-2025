@@ -22,45 +22,10 @@
         th {
             background-color: #f2f2f2;
         }
-        input[type="text"] {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 5px;
-        }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <h1>The Redzone Draft Board</h1>
-    <div>
-        <label for="round">Round:</label>
-        <select id="round">
-            <option value="">Select Round</option>
-            <script>
-                for (let i = 1; i <= 16; i++) {
-                    document.write(`<option value="${i}">Round ${i}</option>`);
-                }
-            </script>
-        </select>
-        <br><br>
-        <label for="team">Team:</label>
-        <select id="team">
-            <option value="">Select Team</option>
-            <script>
-                for (let i = 1; i <= 10; i++) {
-                    document.write(`<option value="Team ${i}">Team ${i}</option>`);
-                }
-            </script>
-        </select>
-        <br><br>
-        <label for="player">Player:</label>
-        <input type="text" id="player" placeholder="Enter player name">
-        <br><br>
-        <button onclick="addPick()">Add Pick</button>
-    </div>
     <table>
         <thead>
             <tr>
@@ -87,9 +52,8 @@
     </table>
 
     <script>
-        let draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
-
         function renderDraftBoard() {
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
             for (let round = 1; round <= 16; round++) {
                 for (let team = 1; team <= 10; team++) {
                     const cellId = `round${round}team${team}`;
@@ -98,25 +62,11 @@
             }
         }
 
-        function addPick() {
-            const round = document.getElementById('round').value;
-            const team = document.getElementById('team').value;
-            const player = document.getElementById('player').value;
-
-            if (round && team && player) {
-                const cellId = `round${round}team${team.substring(5)}`;
-                draftPicks[cellId] = player;
-                localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-                renderDraftBoard();
-                document.getElementById('round').value = '';
-                document.getElementById('team').value = '';
-                document.getElementById('player').value = '';
-            } else {
-                alert('Please select a round, a team, and enter a player name.');
-            }
-        }
-
+        // Initial rendering of the draft board
         renderDraftBoard();
+
+        // Auto-refresh the draft board every 5 seconds
+        setInterval(renderDraftBoard, 5000);
     </script>
 </body>
 </html>
