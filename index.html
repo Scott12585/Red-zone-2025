@@ -97,11 +97,7 @@
         const onTheClock = document.getElementById('on-the-clock');
         const currentPick = document.getElementById('current-pick');
 
-        let currentRound = 1;
-        let currentTeam = 1;
-        let pickNumber = 1;
-
-        // Initialize draft board state
+        // Function to initialize draft board and update the draft state
         function initializeDraftBoard() {
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
             for (let round = 1; round <= 16; round++) {
@@ -113,29 +109,46 @@
             updateDraftState();
         }
 
-        // Update On The Clock and Current Pick
+        // Function to update On The Clock and Current Pick
         function updateDraftState() {
+            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
+            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
+            const pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
+
             onTheClock.textContent = `Team ${currentTeam}`;
             currentPick.textContent = `Round ${currentRound}, Pick ${pickNumber}`;
         }
 
-        // Update current player from input
+        // Function to update the current player and move to the next pick
         function updateCurrentPlayer(player) {
+            const currentRound = parseInt(localStorage.getItem('currentRound')) || 1;
+            const currentTeam = parseInt(localStorage.getItem('currentTeam')) || 1;
+            const pickNumber = parseInt(localStorage.getItem('pickNumber')) || 1;
+
             const cellId = `round${currentRound}team${currentTeam}`;
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
             draftPicks[cellId] = player;
             localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
-            initializeDraftBoard();
-            pickNumber++;
-            if (pickNumber > 10) {
-                pickNumber = 1;
-                currentTeam++;
-                if (currentTeam > 10) {
-                    currentTeam = 1;
-                    currentRound++;
+
+            // Move to next pick
+            let newPickNumber = pickNumber + 1;
+            let newCurrentTeam = currentTeam;
+            let newCurrentRound = currentRound;
+
+            if (newPickNumber > 10) {
+                newPickNumber = 1;
+                newCurrentTeam++;
+                if (newCurrentTeam > 10) {
+                    newCurrentTeam = 1;
+                    newCurrentRound++;
                 }
             }
-            updateDraftState();
+
+            localStorage.setItem('currentRound', newCurrentRound);
+            localStorage.setItem('currentTeam', newCurrentTeam);
+            localStorage.setItem('pickNumber', newPickNumber);
+
+            initializeDraftBoard();
         }
 
         // Initial rendering of the draft board
