@@ -8,35 +8,34 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
             background-color: #efefef;
+            margin: 0;
         }
         .header {
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            font-family: 'Bangers', cursive;
-            color: #5b0f00;
-        }
-        .header div {
-            padding: 10px;
+            text-align: center;
+            background-color: #efefef;
+            padding: 20px 0;
         }
         .title {
             font-family: 'Bangers', cursive;
             font-size: 75px;
             color: #5b0f00;
-            margin-top: 0;
-            margin-bottom: 10px;
+            margin: 0;
         }
-        .on-the-clock,
-        .current-pick {
+        .sub-header {
+            display: flex;
+            justify-content: space-around;
+            font-family: 'Bangers', cursive;
+            color: #5b0f00;
+            margin-top: 10px;
+        }
+        .sub-header div {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-family: 'Bangers', cursive;
+        }
+        .sub-header strong {
             font-size: 24px;
-            color: #5b0f00;
         }
         .team-name {
             font-family: 'Lalezar', cursive;
@@ -63,11 +62,6 @@
         td {
             background-color: #f9f9f9;
         }
-        .team-names th {
-            background-color: #8B0000;
-            color: white;
-            font-weight: bold;
-        }
         .round-column {
             background-color: #8B0000;
             color: white;
@@ -75,6 +69,7 @@
         }
         .entry-link {
             margin-top: 20px;
+            text-align: center;
         }
         .entry-link a {
             padding: 10px;
@@ -88,23 +83,20 @@
         .entry-link a:hover {
             background-color: #45a049;
         }
-        .highlight {
-            background-color: yellow;
-        }
     </style>
 </head>
 <body>
-    <h1 class="title">THE RED ZONE</h1>
-
-    <!-- Header with On The Clock and Current Pick -->
     <div class="header">
-        <div class="on-the-clock">
-            <strong>ON THE CLOCK:</strong>
-            <span class="team-name" id="on-the-clock">Hunter</span>
-        </div>
-        <div class="current-pick">
-            <strong>CURRENT PICK:</strong>
-            <span class="team-name" id="current-pick">Round 1, Pick 1</span>
+        <h1 class="title">THE RED ZONE</h1>
+        <div class="sub-header">
+            <div>
+                <strong>ON THE CLOCK:</strong>
+                <span class="team-name" id="on-the-clock">Hunter</span>
+            </div>
+            <div>
+                <strong>CURRENT PICK:</strong>
+                <span class="team-name" id="current-pick">Round 1, Pick 1</span>
+            </div>
         </div>
     </div>
 
