@@ -21,6 +21,12 @@
             border-radius: 5px;
             border: 1px solid #ddd;
         }
+        .title {
+            font-size: 48px;
+            color: #8B0000;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -30,9 +36,25 @@
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
+            height: 50px;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #8B0000;
+            color: white;
+            font-weight: bold;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        .team-names th {
+            background-color: #8B0000;
+            color: white;
+            font-weight: bold;
+        }
+        .round-column {
+            background-color: #8B0000;
+            color: white;
+            font-weight: bold;
         }
         .entry-link {
             margin-top: 20px;
@@ -49,37 +71,45 @@
         .entry-link a:hover {
             background-color: #45a049;
         }
+        .highlight {
+            background-color: yellow;
+        }
     </style>
 </head>
 <body>
-    <h1>The Redzone Draft Board</h1>
-    
+    <h1 class="title">THE RED ZONE</h1>
+
     <!-- Header with On The Clock and Current Pick -->
     <div class="header">
         <div>
-            <strong>On The Clock:</strong> <span id="on-the-clock">Team 1</span>
+            <strong>ON THE CLOCK:</strong> <span id="on-the-clock">Hunter</span>
         </div>
         <div>
-            <strong>Current Pick:</strong> <span id="current-pick">Round 1, Pick 1</span>
+            <strong>CURRENT PICK:</strong> <span id="current-pick">Round 1, Pick 1</span>
         </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>Round</th>
-                <script>
-                    for (let i = 1; i <= 10; i++) {
-                        document.write(`<th>Team ${i}</th>`);
-                    }
-                </script>
+                <th class="round-column">Rounds</th>
+                <th>HUNTER</th>
+                <th>MASON</th>
+                <th>BRANDON</th>
+                <th>SEAN</th>
+                <th>SCOTT</th>
+                <th>PHILLIP</th>
+                <th>ANDY</th>
+                <th>DAVE</th>
+                <th>CODY</th>
+                <th>CHRIS</th>
             </tr>
         </thead>
         <tbody id="draftBoard">
             <script>
                 for (let round = 1; round <= 16; round++) {
                     document.write('<tr>');
-                    document.write(`<td>${round}</td>`);
+                    document.write(`<td class="round-column">${round}</td>`);
                     for (let team = 1; team <= 10; team++) {
                         document.write(`<td id="round${round}team${team}"></td>`);
                     }
@@ -97,6 +127,11 @@
         const onTheClock = document.getElementById('on-the-clock');
         const currentPick = document.getElementById('current-pick');
 
+        let currentRound = 1;
+        let currentTeam = 1;
+        let pickNumber = 1;
+
+        // Initialize draft board state
         function initializeDraftBoard() {
             const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
             for (let round = 1; round <= 16; round++) {
@@ -108,19 +143,37 @@
             updateDraftState();
         }
 
+        // Update On The Clock and Current Pick
         function updateDraftState() {
-            const currentRound = Math.ceil((currentTeam + 10 - 1) / 10);
-            const currentTeamNumber = ((currentTeam - 1) % 10) + 1;
-            const pickNumber = (currentTeam - 1) % 10 + 1;
-
-            onTheClock.textContent = `Team ${currentTeam}`;
+            const teamNames = ["Hunter", "Mason", "Brandon", "Sean", "Scott", "Phillip", "Andy", "Dave", "Cody", "Chris"];
+            onTheClock.textContent = teamNames[currentTeam - 1];
             currentPick.textContent = `Round ${currentRound}, Pick ${pickNumber}`;
         }
 
+        // Update current player from input
+        function updateCurrentPlayer(player) {
+            const cellId = `round${currentRound}team${currentTeam}`;
+            const draftPicks = JSON.parse(localStorage.getItem('draftPicks')) || {};
+            draftPicks[cellId] = player;
+            localStorage.setItem('draftPicks', JSON.stringify(draftPicks));
+            initializeDraftBoard();
+            pickNumber++;
+            if (pickNumber > 10) {
+                pickNumber = 1;
+                currentTeam++;
+                if (currentTeam > 10) {
+                    currentTeam = 1;
+                    currentRound++;
+                }
+            }
+            updateDraftState();
+        }
+
+        // Initial rendering of the draft board
         initializeDraftBoard();
 
+        // Auto-refresh the draft board every 5 seconds
         setInterval(initializeDraftBoard, 5000);
     </script>
 </body>
 </html>
-
