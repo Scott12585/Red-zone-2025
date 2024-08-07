@@ -9,6 +9,7 @@
         body {
             font-family: Arial, sans-serif;
             text-align: center;
+            background-color: #efefef;
         }
         .header {
             margin-bottom: 20px;
@@ -31,8 +32,8 @@
         .on-the-clock,
         .current-pick {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
             font-family: 'Bangers', cursive;
             font-size: 24px;
             color: #5b0f00;
@@ -41,7 +42,7 @@
             font-family: 'Lalezar', cursive;
             font-size: 28px;
             color: #5b0f00;
-            margin-left: 10px;
+            margin-top: 5px;
         }
         table {
             width: 100%;
@@ -98,10 +99,12 @@
     <!-- Header with On The Clock and Current Pick -->
     <div class="header">
         <div class="on-the-clock">
-            <strong>ON THE CLOCK:</strong> <span class="team-name" id="on-the-clock">Hunter</span>
+            <strong>ON THE CLOCK:</strong>
+            <span class="team-name" id="on-the-clock">Hunter</span>
         </div>
         <div class="current-pick">
-            <strong>CURRENT PICK:</strong> <span class="team-name" id="current-pick">Round 1, Pick 1</span>
+            <strong>CURRENT PICK:</strong>
+            <span class="team-name" id="current-pick">Round 1, Pick 1</span>
         </div>
     </div>
 
