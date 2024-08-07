@@ -17,7 +17,7 @@
             justify-content: space-between; /* Space between elements */
             align-items: center; /* Center items vertically */
             height: 150px; /* Fixed height for the header */
-            padding: 0 20px; /* Optional padding on the sides */
+            padding: 0 40px; /* Padding on the sides to prevent items from touching edges */
             background-color: #efefef;
         }
 
@@ -41,14 +41,23 @@
         }
 
         .sub-header strong {
+            font-family: 'Bangers', cursive; /* Apply Bangers font */
             font-size: 24px;
         }
 
         .team-name {
-            font-family: 'Lalezar', cursive;
+            font-family: 'Lalezar', cursive; /* Apply Lalezar font */
             font-size: 28px;
             color: #5b0f00;
             margin: 0;
+        }
+
+        .on-the-clock {
+            margin-right: 20px; /* Add space from the right edge */
+        }
+
+        .current-pick {
+            margin-left: 20px; /* Add space from the left edge */
         }
 
         table {
@@ -102,14 +111,14 @@
 </head>
 <body>
     <div class="header">
-        <div class="sub-header">
+        <div class="sub-header on-the-clock">
             <div>
                 <strong>ON THE CLOCK:</strong>
                 <span class="team-name" id="on-the-clock">Hunter</span>
             </div>
         </div>
         <h1 class="title">THE RED ZONE</h1>
-        <div class="sub-header">
+        <div class="sub-header current-pick">
             <div>
                 <strong>CURRENT PICK:</strong>
                 <span class="team-name" id="current-pick">Round 1, Pick 1</span>
