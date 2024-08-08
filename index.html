@@ -43,6 +43,7 @@
         .sub-header strong {
             font-family: 'Bangers', cursive;
             font-size: 24px;
+            color: #5b0f00; /* Same color as "On the Clock" and "Current Pick" */
         }
 
         .team-name {
@@ -81,6 +82,13 @@
         td {
             background-color: #f9f9f9;
             border: 1px solid #ddd;
+        }
+
+        /* New gray column to the left of the rounds */
+        .buffer-column {
+            background-color: #efefef;
+            border: none;
+            width: 40px; /* Adjust width as needed */
         }
 
         .round-column {
@@ -153,6 +161,7 @@
     <table>
         <thead>
             <tr>
+                <th class="buffer-column"></th> <!-- Gray column to the left of "Rounds" -->
                 <th class="round-header"> </th>
                 <th class="team-header">HUNTER</th>
                 <th class="team-header">MASON</th>
@@ -170,6 +179,7 @@
             <script>
                 for (let round = 1; round <= 16; round++) {
                     document.write('<tr>');
+                    document.write('<td class="buffer-column"></td>'); // Add gray buffer column
                     document.write(`<td class="round-column">${round}</td>`);
                     for (let team = 1; team <= 10; team++) {
                         document.write(`<td id="round${round}team${team}"></td>`);
@@ -238,4 +248,5 @@
     </script>
 </body>
 </html>
+
 
