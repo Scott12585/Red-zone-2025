@@ -84,11 +84,11 @@
             border: 1px solid #ddd;
         }
 
-        /* New gray column to the left of the rounds */
+        /* Buffer columns to the left and right of the rounds */
         .buffer-column {
             background-color: #efefef;
             border: none;
-            width: 5px; /* Adjust width as needed */
+            width: 2px; /* Adjust width as needed */
         }
 
         .round-column {
@@ -98,7 +98,7 @@
             padding: 2px; /* Adjust padding */
             height: 40px; /* Adjust height */
             text-align: center;
-            padding-left: 2px;
+            padding-left: 5px;
             border: none; /* Remove border from round column */
         }
 
@@ -117,8 +117,8 @@
         .team-header {
             background-color: #5b0f00;
             color: white;
-            font-weight: bold;
             height: 10px; /* Adjust height */
+            font-weight: bold;
             border: none; /* Remove border from team name row */
         }
 
@@ -162,7 +162,7 @@
     <table>
         <thead>
             <tr>
-                <th class="buffer-column"></th> <!-- Gray column to the left of "Rounds" -->
+                <th class="buffer-column"></th> <!-- Left buffer column -->
                 <th class="round-header"> </th>
                 <th class="team-header">HUNTER</th>
                 <th class="team-header">MASON</th>
@@ -174,17 +174,19 @@
                 <th class="team-header">DAVE</th>
                 <th class="team-header">CODY</th>
                 <th class="team-header">CHRIS</th>
+                <th class="buffer-column"></th> <!-- Right buffer column -->
             </tr>
         </thead>
         <tbody id="draftBoard">
             <script>
                 for (let round = 1; round <= 16; round++) {
                     document.write('<tr>');
-                    document.write('<td class="buffer-column"></td>'); // Add gray buffer column
+                    document.write('<td class="buffer-column"></td>'); // Add left buffer column
                     document.write(`<td class="round-column">${round}</td>`);
                     for (let team = 1; team <= 10; team++) {
                         document.write(`<td id="round${round}team${team}"></td>`);
                     }
+                    document.write('<td class="buffer-column"></td>'); // Add right buffer column
                     document.write('</tr>');
                 }
             </script>
