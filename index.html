@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -43,7 +43,7 @@
         .sub-header strong {
             font-family: 'Bangers', cursive;
             font-size: 24px;
-            color: #5b0f00; /* Same color as "On the Clock" and "Current Pick" */
+            color: #5b0f00;
         }
 
         .team-name {
@@ -88,7 +88,7 @@
         .buffer-column {
             background-color: #efefef;
             border: none;
-            width: 2px; /* Adjust width as needed */
+            width: 5px; /* Adjust width as needed */
         }
 
         .round-column {
@@ -114,12 +114,30 @@
             border: none; /* Remove border from round header */
         }
 
-        .team-header {
+          .team-header {
             background-color: #5b0f00;
             color: white;
-            height: 10px; /* Adjust height */
             font-weight: bold;
             border: none; /* Remove border from team name row */
+            height: 30px; /* Set the desired height */
+            padding: 5px; /* Adjust padding as needed */
+        }
+
+        /* Apply border-radius to the corners of the table */
+        .round-header:first-child {
+            border-radius: 10px 0 0 0; /* Top-left corner */
+        }
+
+        .buffer-column:first-child th {
+            border-radius: 0 10px 0 0; /* Top-right corner */
+        }
+
+        .buffer-column:last-child th {
+            border-radius: 0 0 10px 0; /* Bottom-right corner */
+        }
+
+        .round-column:last-child {
+            border-radius: 0 0 0 10px; /* Bottom-left corner */
         }
 
         .entry-link {
@@ -250,6 +268,8 @@
         setInterval(initializeDraftBoard, 5000);
     </script>
 </body>
+</html>
+
 </html>
 
 
