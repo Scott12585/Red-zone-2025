@@ -14,10 +14,10 @@
 
         .header {
             display: flex;
-            justify-content: space-between; /* Space between elements */
-            align-items: center; /* Center items vertically */
-            height: 150px; /* Fixed height for the header */
-            padding: 0 40px; /* Padding on the sides to prevent items from touching edges */
+            justify-content: space-between;
+            align-items: center;
+            height: 150px;
+            padding: 0 40px;
             background-color: #efefef;
         }
 
@@ -31,7 +31,7 @@
         .sub-header {
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center items horizontally within the sub-header */
+            align-items: center;
         }
 
         .sub-header div {
@@ -41,23 +41,23 @@
         }
 
         .sub-header strong {
-            font-family: 'Bangers', cursive; /* Apply Bangers font */
+            font-family: 'Bangers', cursive;
             font-size: 24px;
         }
 
         .team-name {
-            font-family: 'Lalezar', cursive; /* Apply Lalezar font */
+            font-family: 'Lalezar', cursive;
             font-size: 28px;
             color: #5b0f00;
             margin: 0;
         }
 
         .on-the-clock {
-            margin-right: 100px; /* Add space from the right edge */
+            margin-right: 100px;
         }
 
         .current-pick {
-            margin-left: 100px; /* Add space from the left edge */
+            margin-left: 100px;
         }
 
         table {
@@ -67,37 +67,46 @@
         }
 
         th, td {
-            border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
             height: 50px;
         }
 
         th {
-            background-color: #5b0f00; /* Same color as "The Red Zone" */
+            background-color: #5b0f00;
             color: white;
             font-weight: bold;
         }
 
         td {
             background-color: #f9f9f9;
+            border: 1px solid #ddd;
         }
 
         .round-column {
-            background-color: #5b0f00; /* Same color as "The Red Zone" */
+            background-color: #5b0f00;
             color: white;
             font-weight: bold;
-            text-align: left; /* Align round numbers to the left */
-            padding-left: 10px; /* Add white space to the left of round numbers */
+            text-align: left;
+            padding-left: 10px;
+            border: none; /* Remove border from round column */
         }
 
         .round-header {
-            background-color: #5b0f00; /* Same color as "The Red Zone" */
+            background-color: #5b0f00;
             color: white;
             font-weight: bold;
-            border-radius: 10px 0 0 0; /* Rounded top-left corner */
+            border-radius: 10px 0 0 0;
             text-align: left;
             padding-left: 10px;
+            border: none; /* Remove border from round header */
+        }
+
+        .team-header {
+            background-color: #5b0f00;
+            color: white;
+            font-weight: bold;
+            border: none; /* Remove border from team name row */
         }
 
         .entry-link {
@@ -140,17 +149,17 @@
     <table>
         <thead>
             <tr>
-                <th class="round-header">Rounds</th> <!-- Rounded corner only on the "Rounds" header -->
-                <th>HUNTER</th>
-                <th>MASON</th>
-                <th>BRANDON</th>
-                <th>SEAN</th>
-                <th>SCOTT</th>
-                <th>PHILLIP</th>
-                <th>ANDY</th>
-                <th>DAVE</th>
-                <th>CODY</th>
-                <th>CHRIS</th>
+                <th class="round-header">Rounds</th>
+                <th class="team-header">HUNTER</th>
+                <th class="team-header">MASON</th>
+                <th class="team-header">BRANDON</th>
+                <th class="team-header">SEAN</th>
+                <th class="team-header">SCOTT</th>
+                <th class="team-header">PHILLIP</th>
+                <th class="team-header">ANDY</th>
+                <th class="team-header">DAVE</th>
+                <th class="team-header">CODY</th>
+                <th class="team-header">CHRIS</th>
             </tr>
         </thead>
         <tbody id="draftBoard">
@@ -225,3 +234,4 @@
     </script>
 </body>
 </html>
+
